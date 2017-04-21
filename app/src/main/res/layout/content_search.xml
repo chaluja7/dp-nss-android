@@ -8,38 +8,66 @@
     tools:context="cvut.cz.dp.nss.SearchActivity"
     tools:showIn="@layout/activity_search">
 
-    <EditText
+    <cvut.cz.dp.nss.autocomplete.DelayAutoCompleteTextView
         android:id="@+id/stopFrom"
-        android:layout_width="0dp"
+        android:inputType="textFilter"
+        android:layout_width="fill_parent"
         android:layout_height="42dp"
-        android:ems="10"
-        android:inputType="textPersonName"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
         android:hint="Odkud"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        android:imeOptions="flagNoExtractUi|actionSearch"/>
 
-    <EditText
+    <ProgressBar
+        android:id="@+id/stopFromLoadingIndicator"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:visibility="gone"
+        android:layout_marginRight="30dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/stopFrom"
+        android:layout_marginTop="12dp" />
+
+    <cvut.cz.dp.nss.autocomplete.DelayAutoCompleteTextView
         android:id="@+id/stopTo"
-        android:layout_width="0dp"
+        android:inputType="textFilter"
+        android:layout_width="fill_parent"
         android:layout_height="42dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:ems="10"
         android:hint="Kam"
-        android:inputType="textPersonName"
+        app:layout_constraintTop_toBottomOf="@+id/stopFrom"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/stopFrom" />
+        android:imeOptions="flagNoExtractUi|actionSearch"/>
+
+    <ProgressBar
+        android:id="@+id/stopToLoadingIndicator"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:visibility="gone"
+        android:layout_marginRight="30dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stopFrom"
+        app:layout_constraintLeft_toRightOf="@+id/stopFrom"
+        android:layout_marginTop="12dp" />
 
     <TextView
         android:id="@+id/date"
         android:layout_width="100dp"
-        android:layout_height="42dp"
+        android:layout_height="30dp"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:layout_marginTop="8dp"
@@ -48,12 +76,14 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/stopTo"
-        app:layout_constraintHorizontal_bias="0.0" />
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp" />
 
     <TextView
         android:id="@+id/time"
         android:layout_width="100dp"
-        android:layout_height="42dp"
+        android:layout_height="30dp"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:layout_marginTop="8dp"
@@ -62,7 +92,22 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/stopTo"
         app:layout_constraintLeft_toRightOf="@+id/date"
-        app:layout_constraintHorizontal_bias="0.0" />
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/time"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:id="@+id/view"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp" />
 
     <Button
         android:id="@+id/button"
@@ -75,7 +120,22 @@
         android:text="Hledat"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button2"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="88dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="8dp"
+        android:onClick="swapStops"
+        android:text="SWAP"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/time" />
+
 
 
 </android.support.constraint.ConstraintLayout>

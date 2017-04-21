@@ -9,10 +9,9 @@
     <DatePicker
         android:id="@+id/date_picker"
         android:layout_width="match_parent"
-        android:calendarViewShown="true"
-        android:spinnersShown="false"
+        android:layout_height="0dp"
         android:layout_weight="4"
-        android:layout_height="0dp" />
+        android:spinnersShown="false" />
 
     <Button
         android:id="@+id/date_set"

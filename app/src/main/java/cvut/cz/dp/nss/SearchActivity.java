@@ -7,8 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -18,7 +17,17 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
+import cvut.cz.dp.nss.autocomplete.DelayAutoCompleteTextView;
+import cvut.cz.dp.nss.autocomplete.StopAutoCompleteAdapter;
+import cvut.cz.dp.nss.util.DateTimeUtil;
+
+/**
+ * @author jakubchalupa
+ * @since 21.04.17
+ */
 public class SearchActivity extends AppCompatActivity {
+
+    private static final int THRESHOLD = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,11 +42,11 @@ public class SearchActivity extends AppCompatActivity {
 
         //policko aktualne vybraneho datumu
         final TextView dateView = (TextView) findViewById(R.id.date);
-        dateView.setText(getDateString(new GregorianCalendar()));
+        dateView.setText(DateTimeUtil.getDateString(new GregorianCalendar()));
 
         //policko aktualne vybraneho casu
         final TextView timeView = (TextView) findViewById(R.id.time);
-        timeView.setText(getTimeString(new GregorianCalendar()));
+        timeView.setText(DateTimeUtil.getTimeString(new GregorianCalendar()));
 
         //vytvoreni dateTimePicker dialogu
         final View dialogDateView = View.inflate(this, R.layout.date_picker, null);
@@ -64,12 +73,17 @@ public class SearchActivity extends AppCompatActivity {
         });
 
         //udalost po vybrani data z dialogu
+        final DatePicker datePicker = (DatePicker) dialogDateView.findViewById(R.id.date_picker);
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            datePicker.getCalendarView().setFirstDayOfWeek(Calendar.MONDAY);
+        } else {
+            datePicker.setFirstDayOfWeek(Calendar.MONDAY);
+        }
         dialogDateView.findViewById(R.id.date_set).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //a po vyberu data se nasetuje do naseho zobrazovaciho policka
-                DatePicker datePicker = (DatePicker) dialogDateView.findViewById(R.id.date_picker);
-                dateView.setText(getDateString(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth()));
+                dateView.setText(DateTimeUtil.getDateString(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth()));
                 alertDateDialog.dismiss();
             }
         });
@@ -81,10 +95,38 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //a po vyberu casu se nasetuje do naseho zobrazovaciho policka
-                timeView.setText(getTimeString(timePicker.getCurrentHour(), timePicker.getCurrentMinute()));
+                timeView.setText(DateTimeUtil.getTimeString(timePicker.getCurrentHour(), timePicker.getCurrentMinute()));
                 alertTimeDialog.dismiss();
             }
         });
+
+
+        //naseptavac stanice z
+        final DelayAutoCompleteTextView stopFromSearch = (DelayAutoCompleteTextView) findViewById(R.id.stopFrom);
+        stopFromSearch.setThreshold(THRESHOLD);
+        stopFromSearch.setAdapter(new StopAutoCompleteAdapter(this));
+        stopFromSearch.setLoadingIndicator((android.widget.ProgressBar) findViewById(R.id.stopFromLoadingIndicator));
+        stopFromSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                String stop = (String) adapterView.getItemAtPosition(position);
+                stopFromSearch.setText(stop);
+            }
+        });
+
+        //naseptavac stanice do
+        final DelayAutoCompleteTextView stopToSearch = (DelayAutoCompleteTextView) findViewById(R.id.stopTo);
+        stopToSearch.setThreshold(THRESHOLD);
+        stopToSearch.setAdapter(new StopAutoCompleteAdapter(this));
+        stopToSearch.setLoadingIndicator((android.widget.ProgressBar) findViewById(R.id.stopToLoadingIndicator));
+        stopToSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                String stop = (String) adapterView.getItemAtPosition(position);
+                stopToSearch.setText(stop);
+            }
+        });
+
     }
 
 //    @Override
@@ -110,27 +152,26 @@ public class SearchActivity extends AppCompatActivity {
 //    }
 
     public void submitForm(View view) {
+        EditText stopFrom = (EditText) findViewById(R.id.stopFrom);
+
+        //TODO
         Intent intent = new Intent(this, SearchResultActivity.class);
-        EditText editText = (EditText) findViewById(R.id.stopFrom);
-        String message = editText.getText().toString();
-        intent.putExtra("stopFrom", message);
+        intent.putExtra("stopFrom", stopFrom.getText().toString());
         startActivity(intent);
     }
 
-    private String getDateString(Calendar calendar) {
-        return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "." + calendar.get(Calendar.YEAR);
-    }
+    /**
+     * prohodi stanice odkud a kam
+     * @param view view
+     */
+    public void swapStops(View view) {
+        DelayAutoCompleteTextView stopFrom = (DelayAutoCompleteTextView) findViewById(R.id.stopFrom);
+        DelayAutoCompleteTextView stopTo = (DelayAutoCompleteTextView) findViewById(R.id.stopTo);
+        String stopFromName = stopFrom.getText().toString();
 
-    private String getDateString(int year, int month, int day) {
-        return day + "." + month + "." + year;
-    }
-
-    private String getTimeString(Calendar calendar) {
-        return getTimeString(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
-    }
-
-    private String getTimeString(int hour, int minute) {
-        return hour + ":" + (minute < 10 ? "0" + minute : minute);
+        //a nechci pri prohozeni spustit filtering
+        stopFrom.setText(stopTo.getText(), false);
+        stopTo.setText(stopFromName, false);
     }
 
 }

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cvut.cz.dp.nss.R;
-import cvut.cz.dp.nss.rest.RestSyncClient;
+import cvut.cz.dp.nss.rest.RestClient;
 import cz.msebera.android.httpclient.Header;
 
 /**
@@ -98,7 +98,7 @@ public class StopAutoCompleteAdapter extends BaseAdapter implements Filterable {
         RequestParams params = new RequestParams("startsWith", stopStartsWith);
         final List<String> stops = new ArrayList<>();
 
-        RestSyncClient.get("stop", params, new JsonHttpResponseHandler() {
+        RestClient.getSync("x-pid/stop", params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
                 try {

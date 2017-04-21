@@ -9,7 +9,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -152,11 +151,18 @@ public class SearchActivity extends AppCompatActivity {
 //    }
 
     public void submitForm(View view) {
-        EditText stopFrom = (EditText) findViewById(R.id.stopFrom);
+        DelayAutoCompleteTextView stopFrom = (DelayAutoCompleteTextView) findViewById(R.id.stopFrom);
+        DelayAutoCompleteTextView stopTo = (DelayAutoCompleteTextView) findViewById(R.id.stopTo);
 
-        //TODO
         Intent intent = new Intent(this, SearchResultActivity.class);
+        intent.putExtra("timeTable", "pid");
         intent.putExtra("stopFrom", stopFrom.getText().toString());
+        intent.putExtra("stopTo", stopTo.getText().toString());
+        intent.putExtra("stopThrough", "");
+        intent.putExtra("date", "16.3.2017 15:00");
+        intent.putExtra("maxTransfers", 3);
+        intent.putExtra("withWheelChair", false);
+
         startActivity(intent);
     }
 

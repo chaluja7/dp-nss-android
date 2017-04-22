@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -196,6 +197,11 @@ public class SearchActivity extends AppCompatActivity {
         DelayAutoCompleteTextView stopTo = (DelayAutoCompleteTextView) findViewById(R.id.stopTo);
         DelayAutoCompleteTextView stopThrough = (DelayAutoCompleteTextView) findViewById(R.id.stopThrough);
         Spinner spinner = (Spinner) findViewById(R.id.timetable_spinner);
+        RadioGroup radioButtons = (RadioGroup) findViewById(R.id.radioButtons);
+
+        final int radioButtonID = radioButtons.getCheckedRadioButtonId();
+        //0 = odjezd, 1 = prijezd
+        final int checkedIndex = radioButtons.indexOfChild(radioButtons.findViewById(radioButtonID));
 
         Intent intent = new Intent(this, SearchResultActivity.class);
         intent.putExtra(SearchParam.TIME_TABLE.getValue(), timeTableMap.get(spinner.getSelectedItem().toString()));
@@ -205,7 +211,7 @@ public class SearchActivity extends AppCompatActivity {
         intent.putExtra(SearchParam.DATE.getValue(), "16.3.2017 15:00");
         intent.putExtra(SearchParam.MAX_TRANSFERS.getValue(), 3);
         intent.putExtra(SearchParam.WITH_WHEELCHAIR.getValue(), false);
-        intent.putExtra(SearchParam.BY_ARRIVAL.getValue(), false);
+        intent.putExtra(SearchParam.BY_ARRIVAL.getValue(), checkedIndex == 1);
 
         startActivity(intent);
     }

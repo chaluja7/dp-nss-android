@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -127,6 +128,19 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+        //naseptavac stanice pres
+        final DelayAutoCompleteTextView stopThroughSearch = (DelayAutoCompleteTextView) findViewById(R.id.stopThrough);
+        stopThroughSearch.setThreshold(THRESHOLD);
+        stopThroughSearch.setAdapter(new StopAutoCompleteAdapter(this));
+        stopThroughSearch.setLoadingIndicator((android.widget.ProgressBar) findViewById(R.id.stopThroughLoadingIndicator));
+        stopThroughSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                String stop = (String) adapterView.getItemAtPosition(position);
+                stopThroughSearch.setText(stop);
+            }
+        });
+
     }
 
 //    @Override
@@ -154,12 +168,13 @@ public class SearchActivity extends AppCompatActivity {
     public void submitForm(View view) {
         DelayAutoCompleteTextView stopFrom = (DelayAutoCompleteTextView) findViewById(R.id.stopFrom);
         DelayAutoCompleteTextView stopTo = (DelayAutoCompleteTextView) findViewById(R.id.stopTo);
+        DelayAutoCompleteTextView stopThrough = (DelayAutoCompleteTextView) findViewById(R.id.stopThrough);
 
         Intent intent = new Intent(this, SearchResultActivity.class);
         intent.putExtra(SearchParam.TIME_TABLE.getValue(), "pid");
         intent.putExtra(SearchParam.STOP_FROM.getValue(), stopFrom.getText().toString());
         intent.putExtra(SearchParam.STOP_TO.getValue(), stopTo.getText().toString());
-        intent.putExtra(SearchParam.STOP_THROUGH.getValue(), "");
+        intent.putExtra(SearchParam.STOP_THROUGH.getValue(), stopThrough.getText().toString());
         intent.putExtra(SearchParam.DATE.getValue(), "16.3.2017 15:00");
         intent.putExtra(SearchParam.MAX_TRANSFERS.getValue(), 3);
         intent.putExtra(SearchParam.WITH_WHEELCHAIR.getValue(), false);
@@ -180,6 +195,25 @@ public class SearchActivity extends AppCompatActivity {
         //a nechci pri prohozeni spustit filtering
         stopFrom.setText(stopTo.getText(), false);
         stopTo.setText(stopFromName, false);
+    }
+
+    /**
+     * prida/odebere stanci pres
+     * @param view view
+     */
+    public void toogleThroughStop(View view) {
+        DelayAutoCompleteTextView stopThrough = (DelayAutoCompleteTextView) findViewById(R.id.stopThrough);
+        ImageButton imageButton = (ImageButton) findViewById(R.id.button3);
+
+        int currentVisibility = stopThrough.getVisibility();
+        if(View.VISIBLE == currentVisibility) {
+            stopThrough.setVisibility(View.GONE);
+            stopThrough.setText("", false);
+            imageButton.setBackgroundResource(R.drawable.ic_control_point_black_48dp);
+        } else {
+            stopThrough.setVisibility(View.VISIBLE);
+            imageButton.setBackgroundResource(R.drawable.ic_highlight_off_black_48dp);
+        }
     }
 
 }

@@ -37,6 +37,35 @@
         android:layout_marginTop="12dp" />
 
     <cvut.cz.dp.nss.autocomplete.DelayAutoCompleteTextView
+        android:id="@+id/stopThrough"
+        android:inputType="textFilter"
+        android:layout_width="fill_parent"
+        android:layout_height="42dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        android:hint="Přes..."
+        app:layout_constraintTop_toBottomOf="@+id/stopFrom"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:imeOptions="flagNoExtractUi|actionSearch"/>
+
+    <ProgressBar
+        android:id="@+id/stopThroughLoadingIndicator"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:visibility="gone"
+        android:layout_marginRight="30dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stopFrom"
+        app:layout_constraintLeft_toRightOf="@+id/stopFrom"
+        android:layout_marginTop="12dp" />
+
+    <cvut.cz.dp.nss.autocomplete.DelayAutoCompleteTextView
         android:id="@+id/stopTo"
         android:inputType="textFilter"
         android:layout_width="fill_parent"
@@ -45,7 +74,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
         android:text="Karlovo náměstí"
-        app:layout_constraintTop_toBottomOf="@+id/stopFrom"
+        app:layout_constraintTop_toBottomOf="@+id/stopThrough"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:imeOptions="flagNoExtractUi|actionSearch"/>
@@ -60,7 +89,7 @@
         android:layout_marginRight="30dp"
         android:layout_marginEnd="30dp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/stopFrom"
+        app:layout_constraintTop_toBottomOf="@+id/stopThrough"
         app:layout_constraintLeft_toRightOf="@+id/stopFrom"
         android:layout_marginTop="12dp" />
 
@@ -125,17 +154,26 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintHorizontal_bias="0.0" />
 
-    <Button
+    <ImageButton
         android:id="@+id/button2"
-        android:layout_width="88dp"
+        android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/ic_swap_horiz_black_48dp"
         android:onClick="swapStops"
-        android:text="SWAP"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/time" />
 
-
+    <ImageButton
+        android:id="@+id/button3"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/ic_control_point_black_48dp"
+        android:onClick="toogleThroughStop"
+        app:layout_constraintLeft_toRightOf="@+id/button2"
+        app:layout_constraintTop_toBottomOf="@+id/time" />
 
 </android.support.constraint.ConstraintLayout>

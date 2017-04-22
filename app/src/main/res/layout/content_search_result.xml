@@ -10,6 +10,18 @@
     tools:showIn="@layout/activity_search_result"
     android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/errorMessage"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:textColor="@android:color/holo_red_dark"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
+        android:text="Při vyhledávání došlo k chybě. Zkuste požadavek opakovat."/>
+
     <Button
         android:id="@+id/prevButton"
         android:layout_width="match_parent"
@@ -18,9 +30,11 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:text="Zobrazit předchozí"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"/>
+        android:layout_marginEnd="8dp"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/nextButton"
@@ -33,20 +47,22 @@
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        android:text="Zobrazit další" />
+        android:text="Zobrazit další"
+        android:visibility="invisible"/>
 
     <ScrollView
         android:id="@+id/scrollView1"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/nextButton"
         android:layout_below="@id/prevButton"
-        android:layout_gravity="center_horizontal">
+        android:layout_centerHorizontal="true">
 
-        <TableLayout
+        <LinearLayout
             android:id="@+id/result_table"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
 
     </ScrollView>
 

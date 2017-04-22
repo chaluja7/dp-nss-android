@@ -1,12 +1,14 @@
 package cvut.cz.dp.nss;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,8 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cvut.cz.dp.nss.rest.RestClient;
+import cvut.cz.dp.nss.search.SearchParam;
 import cvut.cz.dp.nss.search.SearchResultWrapper;
 import cvut.cz.dp.nss.search.SearchStopTimeWrapper;
+import cvut.cz.dp.nss.util.DateTimeUtil;
 import cz.msebera.android.httpclient.Header;
 
 /**
@@ -39,137 +43,161 @@ public class SearchResultActivity extends AppCompatActivity {
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.searchLoadingIndicator);
         progressBar.setVisibility(View.VISIBLE);
 
-        Intent intent = getIntent();
-        List<SearchResultWrapper> results = search(intent.getStringExtra("timeTable"), intent.getStringExtra("stopFrom"),
-                intent.getStringExtra("stopTo"), intent.getStringExtra("stopThrough"),
-                intent.getStringExtra("date"), intent.getIntExtra("maxTransfers", 3), intent.getBooleanExtra("withWheelChair", false),
-                progressBar);
-
-
-//        // Capture the layout's TextView and set the string as its text
-//        TextView textView = (TextView) findViewById(R.id.textView);
-//        String s = results.size() + "";
-//        textView.setText(s);
+        final Intent intent = getIntent();
+        search(intent.getStringExtra(SearchParam.TIME_TABLE.getValue()),
+                intent.getStringExtra(SearchParam.STOP_FROM.getValue()),
+                intent.getStringExtra(SearchParam.STOP_TO.getValue()), intent.getStringExtra(SearchParam.STOP_THROUGH.getValue()),
+                intent.getStringExtra(SearchParam.DATE.getValue()), intent.getIntExtra(SearchParam.MAX_TRANSFERS.getValue(), 3),
+                intent.getBooleanExtra(SearchParam.WITH_WHEELCHAIR.getValue(), false),
+                intent.getBooleanExtra(SearchParam.BY_ARRIVAL.getValue(), false), progressBar);
     }
 
+    /**
+     * provede rest hledani spoju a po nalezeni je zobrazi na obrazovce
+     *
+     * @param timeTableId id jizdniho radu
+     * @param stopFrom stanice z
+     * @param stopTo stanice do
+     * @param stopThrough stanice pres
+     * @param date datum a cas
+     * @param maxTransfers max pocet prestupu
+     * @param withWheelChair pouze bezbarierove?
+     * @param byArrival hledam dle casu prijezdu?
+     * @param progressBar tocitko na obrazovce
+     * @return nalezene vysledky
+     */
     private List<SearchResultWrapper> search(String timeTableId, String stopFrom, String stopTo, String stopThrough,
-                                             String date, int maxTransfers, boolean withWheelChair, final ProgressBar progressBar) {
+                                             String date, int maxTransfers, boolean withWheelChair,
+                                             boolean byArrival, final ProgressBar progressBar) {
+
         if(StringUtils.isBlank(timeTableId) || StringUtils.isBlank(stopFrom) || StringUtils.isBlank(stopTo) || StringUtils.isBlank(date)) {
+            progressBar.setVisibility(View.GONE);
             return new ArrayList<>();
         }
 
+        //priprava parametru pro http request
         RequestParams params = new RequestParams();
-        params.add("stopFromName", stopFrom);
-        params.add("stopToName", stopTo);
-        if(!StringUtils.isBlank(stopThrough)) params.add("stopThroughName", stopThrough);
-        params.add("departure", date);
-        params.add("maxTransfers", maxTransfers + "");
-        if(withWheelChair) params.add("withWheelChair", "true");
+        params.add(SearchParam.STOP_FROM.getValue(), stopFrom);
+        params.add(SearchParam.STOP_TO.getValue(), stopTo);
+        if(!StringUtils.isBlank(stopThrough)) params.add(SearchParam.STOP_THROUGH.getValue(), stopThrough);
+        params.add(SearchParam.DATE.getValue(), date);
+        params.add(SearchParam.MAX_TRANSFERS.getValue(), maxTransfers + "");
+        if(withWheelChair) params.add(SearchParam.WITH_WHEELCHAIR.getValue(), "true");
+        if(byArrival) params.add(SearchParam.BY_ARRIVAL.getValue(), "true");
 
         final List<SearchResultWrapper> results = new ArrayList<>();
-
         final SearchResultActivity self = this;
 
         RestClient.getAsync("x-" + timeTableId + "/search", params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 try {
-
+                    //ziskam vsechny vysledky hledani
                     ObjectMapper mapper = new ObjectMapper();
                     for(int i = 0; i < response.length(); i++) {
                         results.add(mapper.readValue(response.getJSONObject(i).toString(), SearchResultWrapper.class));
                     }
+                    //vypnu tocici se kolecko
                     progressBar.setVisibility(View.GONE);
 
-                    TableLayout table = (TableLayout) findViewById(R.id.result_table);
-
+                    //najdu si layout, kam vykresluju vysledky
+                    LinearLayout table = (LinearLayout) findViewById(R.id.result_table);
                     int count = 0;
                     for(SearchResultWrapper result : results) {
 
+                        //pro kazdy nalezeny spoj pridavam novy prvek na obrazovku
+                        LayoutInflater inflater = (LayoutInflater) self.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        View convertView = inflater.inflate(R.layout.result_search_item, table, false);
+
                         for(int i = 0; i < result.getStopTimes().size(); i++) {
-
-                            TableRow tableRow = new TableRow(self);
-                            tableRow.setMinimumHeight(50);
-                            tableRow.setPadding(20, 10, 20, 0);
-
                             SearchStopTimeWrapper stopTime = result.getStopTimes().get(i);
 
-
-                            //cas
-                            TextView textView = new TextView(self);
-                            textView.setPadding(0, 0, 20, 0);
-                            textView.setTextSize(22);
                             if(i % 2 == 0) {
-                                textView.setText(stopTime.getDeparture());
+                                //prvni zastaveni spoje (vyjezd)
+                                inflater = (LayoutInflater) self.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                                convertView = inflater.inflate(R.layout.result_search_item, table, false);
+
+                                ((TextView) convertView.findViewById(R.id.time1)).setText(DateTimeUtil.getTimeWithoutSeconds(stopTime.getDeparture()));
+                                ((TextView) convertView.findViewById(R.id.stop1)).setText(stopTime.getStop().getName());
+                                final Integer imageResource = getImageResource(stopTime.getTrip().getRoute().getTypeCode());
+                                if(imageResource != null) {
+                                    ((ImageView) convertView.findViewById(R.id.routeImage)).setImageResource(imageResource);
+                                }
+                                ((TextView) convertView.findViewById(R.id.routeName)).setText(stopTime.getTrip().getRoute().getShortName());
                             } else {
-                                textView.setText(stopTime.getArrival());
+                                //druhe zastaveni spoje (prijezd)
+                                ((TextView) convertView.findViewById(R.id.time2)).setText(DateTimeUtil.getTimeWithoutSeconds(stopTime.getArrival()));
+                                ((TextView) convertView.findViewById(R.id.stop2)).setText(stopTime.getStop().getName());
+                                table.addView(convertView);
                             }
-                            tableRow.addView(textView);
 
-                            //stanice
-                            TextView textViewStop = new TextView(self);
-                            textViewStop.setPadding(0, 0, 30, 0);
-                            textViewStop.setTextSize(22);
-                            textViewStop.setText(stopTime.getStop().getName());
-                            tableRow.addView(textViewStop);
-
-                            TextView textViewRoute = new TextView(self);
-                            textViewRoute.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                            if(i % 2 == 0) {
-                                textViewRoute.setTextSize(16);
-                                textViewRoute.setText("METRO");
-                            } else {
-                                textViewRoute.setTextSize(16);
-                                textViewRoute.setText(stopTime.getTrip().getRoute().getShortName());
-                            }
-                            tableRow.addView(textViewRoute);
-
-
-                            table.addView(tableRow);
                         }
 
+                        //informace o cele ceste
+                        TextView infoView = (TextView) convertView.findViewById(R.id.info);
+                        final int minutes = (int) Math.ceil(result.getTravelTime() / 60.0);
+                        infoView.setText("Celkový čas jízdy: " + minutes + DateTimeUtil.getMinutesLabel(minutes));
+                        infoView.setVisibility(View.VISIBLE);
+
+                        //oddelovac nalezenych vysledku
                         if(++count < results.size()) {
-                            TableRow tableRow = new TableRow(self);
-                            tableRow.setMinimumHeight(80);
-                            table.addView(tableRow);
+                            convertView.findViewById(R.id.delim).setVisibility(View.VISIBLE);
                         }
                     }
 
+                    //vse probehlo v poradku, takze zobrazim tlacitka na predchozi a pristi spoje
+                    findViewById(R.id.prevButton).setVisibility(View.VISIBLE);
+                    findViewById(R.id.nextButton).setVisibility(View.VISIBLE);
                 } catch (Exception e) {
-                    //nothing
-                    int i = 0;
+                    findViewById(R.id.errorMessage).setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
                 }
-
-                int i = 0;
             }
-
-//            @Override
-//            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-//                super.onSuccess(statusCode, headers, response);
-//            }
-//
-//            @Override
-//            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-//                super.onSuccess(statusCode, headers, responseString);
-//            }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                findViewById(R.id.errorMessage).setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
                 super.onFailure(statusCode, headers, responseString, throwable);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                findViewById(R.id.errorMessage).setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                findViewById(R.id.errorMessage).setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
 
         return results;
+    }
+
+    /**
+     * @param routeType kod typu spoje
+     * @return obrazek k tomuto typu spoje. null, pokud neexistuje
+     */
+    private static Integer getImageResource(Integer routeType) {
+        if(routeType == null) return null;
+
+        switch(routeType) {
+            case 0:
+                return R.drawable.tram_p;
+            case 1:
+                return R.drawable.metro_p;
+            case 2:
+                return R.drawable.train_p;
+            case 3:
+                return R.drawable.bus_p;
+            default:
+                return null;
+        }
     }
 
 }

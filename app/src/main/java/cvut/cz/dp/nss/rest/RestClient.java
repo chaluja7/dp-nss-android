@@ -16,8 +16,16 @@ public class RestClient {
      */
     private static final String BASE_URL = "http://10.0.2.2:8080/api/v1/";
 
-    private static SyncHttpClient syncClient = new SyncHttpClient();
-    private static AsyncHttpClient asyncClient = new AsyncHttpClient();
+    private static SyncHttpClient syncClient;
+    private static AsyncHttpClient asyncClient;
+
+    static {
+        syncClient = new SyncHttpClient();
+        asyncClient = new AsyncHttpClient();
+
+        //timeout 45s
+        asyncClient.setTimeout(45000);
+    }
 
     public static void getSync(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         syncClient.get(getAbsoluteUrl(url), params, responseHandler);

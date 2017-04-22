@@ -25,4 +25,17 @@ public class DateTimeUtil {
         return hour + ":" + (minute < 10 ? "0" + minute : minute);
     }
 
+    public static String getTimeWithoutSeconds(String time) {
+        if(time == null || !time.contains(":")) return time;
+
+        String[] split = time.split(":");
+        return split.length == 3 ? split[0] + ":" + split[1] : time;
+    }
+
+    public static String getMinutesLabel(int numOfMinutes) {
+        if(numOfMinutes == 1) return " minuta";
+        if(numOfMinutes >= 2 && numOfMinutes <= 4) return " minuty";
+        return " minut";
+    }
+
 }

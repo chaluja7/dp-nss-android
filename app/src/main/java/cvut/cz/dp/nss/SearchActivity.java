@@ -18,6 +18,7 @@ import java.util.Locale;
 
 import cvut.cz.dp.nss.autocomplete.DelayAutoCompleteTextView;
 import cvut.cz.dp.nss.autocomplete.StopAutoCompleteAdapter;
+import cvut.cz.dp.nss.search.SearchParam;
 import cvut.cz.dp.nss.util.DateTimeUtil;
 
 /**
@@ -155,13 +156,14 @@ public class SearchActivity extends AppCompatActivity {
         DelayAutoCompleteTextView stopTo = (DelayAutoCompleteTextView) findViewById(R.id.stopTo);
 
         Intent intent = new Intent(this, SearchResultActivity.class);
-        intent.putExtra("timeTable", "pid");
-        intent.putExtra("stopFrom", stopFrom.getText().toString());
-        intent.putExtra("stopTo", stopTo.getText().toString());
-        intent.putExtra("stopThrough", "");
-        intent.putExtra("date", "16.3.2017 15:00");
-        intent.putExtra("maxTransfers", 3);
-        intent.putExtra("withWheelChair", false);
+        intent.putExtra(SearchParam.TIME_TABLE.getValue(), "pid");
+        intent.putExtra(SearchParam.STOP_FROM.getValue(), stopFrom.getText().toString());
+        intent.putExtra(SearchParam.STOP_TO.getValue(), stopTo.getText().toString());
+        intent.putExtra(SearchParam.STOP_THROUGH.getValue(), "");
+        intent.putExtra(SearchParam.DATE.getValue(), "16.3.2017 15:00");
+        intent.putExtra(SearchParam.MAX_TRANSFERS.getValue(), 3);
+        intent.putExtra(SearchParam.WITH_WHEELCHAIR.getValue(), false);
+        intent.putExtra(SearchParam.BY_ARRIVAL.getValue(), false);
 
         startActivity(intent);
     }

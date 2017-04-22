@@ -145,9 +145,14 @@ public class SearchResultActivity extends AppCompatActivity {
                         }
                     }
 
-                    //vse probehlo v poradku, takze zobrazim tlacitka na predchozi a pristi spoje
-                    findViewById(R.id.prevButton).setVisibility(View.VISIBLE);
-                    findViewById(R.id.nextButton).setVisibility(View.VISIBLE);
+                    if(!results.isEmpty()) {
+                        //vse probehlo v poradku, takze zobrazim tlacitka na predchozi a pristi spoje
+                        findViewById(R.id.prevButton).setVisibility(View.VISIBLE);
+                        findViewById(R.id.nextButton).setVisibility(View.VISIBLE);
+                    } else {
+                        //nenalezeny zadne vysledky
+                        findViewById(R.id.noResultsMessage).setVisibility(View.VISIBLE);
+                    }
                 } catch (Exception e) {
                     findViewById(R.id.errorMessage).setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);

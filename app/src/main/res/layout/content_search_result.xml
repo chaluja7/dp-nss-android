@@ -16,11 +16,23 @@
         android:layout_height="50dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@android:color/holo_red_light"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="gone"
         android:text="Při vyhledávání došlo k chybě. Zkuste požadavek opakovat."/>
+
+    <TextView
+        android:id="@+id/noResultsMessage"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:textColor="@android:color/holo_red_light"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
+        android:text="Nebyly nalezeny žádné spoje. Zkuste hledání s jinými parametry."/>
 
     <Button
         android:id="@+id/prevButton"

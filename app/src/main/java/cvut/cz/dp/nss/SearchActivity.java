@@ -78,7 +78,7 @@ public class SearchActivity extends AppCompatActivity {
         alertTimeDialog.setView(dialogTimeView);
 
         //po kliknuti na datum se otevre dialog pro vyber data
-        this.findViewById(R.id.date).setOnClickListener(new View.OnClickListener() {
+        dateView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 alertDateDialog.show();
@@ -86,7 +86,7 @@ public class SearchActivity extends AppCompatActivity {
         });
 
         //po kliknuti na cas se otevre dialog vyberu casu (24 hodinovy)
-        this.findViewById(R.id.time).setOnClickListener(new View.OnClickListener() {
+        timeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 alertTimeDialog.show();
@@ -104,7 +104,7 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //a po vyberu data se nasetuje do naseho zobrazovaciho policka
-                dateView.setText(DateTimeUtil.getDateString(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth()));
+                dateView.setText(DateTimeUtil.getDateString(datePicker.getYear(), datePicker.getMonth() + 1, datePicker.getDayOfMonth()));
                 alertDateDialog.dismiss();
             }
         });
@@ -196,13 +196,15 @@ public class SearchActivity extends AppCompatActivity {
 
     public void submitForm(View view) {
         //sesbiram data z jednotlivych komponent
-        DelayAutoCompleteTextView stopFrom = (DelayAutoCompleteTextView) findViewById(R.id.stopFrom);
-        DelayAutoCompleteTextView stopTo = (DelayAutoCompleteTextView) findViewById(R.id.stopTo);
-        DelayAutoCompleteTextView stopThrough = (DelayAutoCompleteTextView) findViewById(R.id.stopThrough);
-        Spinner spinner = (Spinner) findViewById(R.id.timetable_spinner);
-        RadioGroup radioButtons = (RadioGroup) findViewById(R.id.radioButtons);
-        Spinner maxTransfersSpinner = (Spinner) dialogOptionView.findViewById(R.id.maxTransfers_spinner);
-        CheckBox wheelChair = (CheckBox) dialogOptionView.findViewById(R.id.wheelChairCheck);
+        final DelayAutoCompleteTextView stopFrom = (DelayAutoCompleteTextView) findViewById(R.id.stopFrom);
+        final DelayAutoCompleteTextView stopTo = (DelayAutoCompleteTextView) findViewById(R.id.stopTo);
+        final DelayAutoCompleteTextView stopThrough = (DelayAutoCompleteTextView) findViewById(R.id.stopThrough);
+        final Spinner spinner = (Spinner) findViewById(R.id.timetable_spinner);
+        final RadioGroup radioButtons = (RadioGroup) findViewById(R.id.radioButtons);
+        final Spinner maxTransfersSpinner = (Spinner) dialogOptionView.findViewById(R.id.maxTransfers_spinner);
+        final CheckBox wheelChair = (CheckBox) dialogOptionView.findViewById(R.id.wheelChairCheck);
+        final TextView dateView = (TextView) findViewById(R.id.date);
+        final TextView timeView = (TextView) findViewById(R.id.time);
 
         //0 = odjezd, 1 = prijezd
         final int checkedIndex = radioButtons.indexOfChild(radioButtons.findViewById(radioButtons.getCheckedRadioButtonId()));
@@ -212,6 +214,8 @@ public class SearchActivity extends AppCompatActivity {
         intent.putExtra(SearchParam.STOP_FROM.getValue(), stopFrom.getText().toString());
         intent.putExtra(SearchParam.STOP_TO.getValue(), stopTo.getText().toString());
         intent.putExtra(SearchParam.STOP_THROUGH.getValue(), stopThrough.getText().toString());
+        //TODO plati to prvni
+//        intent.putExtra(SearchParam.DATE.getValue(), dateView.getText().toString() + " " + timeView.getText().toString());
         intent.putExtra(SearchParam.DATE.getValue(), "16.3.2017 15:00");
         intent.putExtra(SearchParam.MAX_TRANSFERS.getValue(), Integer.parseInt(maxTransfersSpinner.getSelectedItem().toString()));
         intent.putExtra(SearchParam.WITH_WHEELCHAIR.getValue(), wheelChair.isChecked());

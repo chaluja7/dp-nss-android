@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
@@ -39,6 +41,8 @@ public class SearchActivity extends AppCompatActivity {
      * name -> id
      */
     private Map<String, String> timeTableMap;
+
+    private View dialogOptionView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +121,26 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+        //dialog s nastavenim
+        dialogOptionView = View.inflate(this, R.layout.options_window, null);
+        final AlertDialog alertOptionDialog = new AlertDialog.Builder(this).create();
+        alertOptionDialog.setView(dialogOptionView);
+
+        //po kliknuti na ikonku nastaveni se otevre dialog nastaveni
+        this.findViewById(R.id.button4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertOptionDialog.show();
+            }
+        });
+
+        //vyber z moznych poctu prestupu
+        Spinner maxTransfersSpinner = (Spinner) dialogOptionView.findViewById(R.id.maxTransfers_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.maxTransfers_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        maxTransfersSpinner.setAdapter(adapter);
+        maxTransfersSpinner.setSelection(3);
+
         //selectbox pro vyber jizdniho radu
         final Spinner spinner = (Spinner) findViewById(R.id.timetable_spinner);
         final TimeTableAdapter timeTableAdapter = new TimeTableAdapter(this);
@@ -170,38 +194,18 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_search, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
-
     public void submitForm(View view) {
+        //sesbiram data z jednotlivych komponent
         DelayAutoCompleteTextView stopFrom = (DelayAutoCompleteTextView) findViewById(R.id.stopFrom);
         DelayAutoCompleteTextView stopTo = (DelayAutoCompleteTextView) findViewById(R.id.stopTo);
         DelayAutoCompleteTextView stopThrough = (DelayAutoCompleteTextView) findViewById(R.id.stopThrough);
         Spinner spinner = (Spinner) findViewById(R.id.timetable_spinner);
         RadioGroup radioButtons = (RadioGroup) findViewById(R.id.radioButtons);
+        Spinner maxTransfersSpinner = (Spinner) dialogOptionView.findViewById(R.id.maxTransfers_spinner);
+        CheckBox wheelChair = (CheckBox) dialogOptionView.findViewById(R.id.wheelChairCheck);
 
-        final int radioButtonID = radioButtons.getCheckedRadioButtonId();
         //0 = odjezd, 1 = prijezd
-        final int checkedIndex = radioButtons.indexOfChild(radioButtons.findViewById(radioButtonID));
+        final int checkedIndex = radioButtons.indexOfChild(radioButtons.findViewById(radioButtons.getCheckedRadioButtonId()));
 
         Intent intent = new Intent(this, SearchResultActivity.class);
         intent.putExtra(SearchParam.TIME_TABLE.getValue(), timeTableMap.get(spinner.getSelectedItem().toString()));
@@ -209,8 +213,8 @@ public class SearchActivity extends AppCompatActivity {
         intent.putExtra(SearchParam.STOP_TO.getValue(), stopTo.getText().toString());
         intent.putExtra(SearchParam.STOP_THROUGH.getValue(), stopThrough.getText().toString());
         intent.putExtra(SearchParam.DATE.getValue(), "16.3.2017 15:00");
-        intent.putExtra(SearchParam.MAX_TRANSFERS.getValue(), 3);
-        intent.putExtra(SearchParam.WITH_WHEELCHAIR.getValue(), false);
+        intent.putExtra(SearchParam.MAX_TRANSFERS.getValue(), Integer.parseInt(maxTransfersSpinner.getSelectedItem().toString()));
+        intent.putExtra(SearchParam.WITH_WHEELCHAIR.getValue(), wheelChair.isChecked());
         intent.putExtra(SearchParam.BY_ARRIVAL.getValue(), checkedIndex == 1);
 
         startActivity(intent);
@@ -252,4 +256,5 @@ public class SearchActivity extends AppCompatActivity {
     public Map<String, String> getTimeTableMap() {
         return timeTableMap;
     }
+
 }

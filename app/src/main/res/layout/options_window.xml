@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:padding="8dp"
+    android:layout_height="match_parent">
+
+    <CheckBox
+        android:id="@+id/wheelChairCheck"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:textSize="20sp"
+        android:text="Pouze bezbariérové spoje" />
+
+    <TextView
+        android:id="@+id/transLabel"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:textColor="#000"
+        android:textSize="20sp"
+        android:text="Max počet přestupů"
+        />
+
+    <Spinner
+        android:id="@+id/maxTransfers_spinner"
+        android:layout_width="100dp"
+        android:layout_height="40dp" />
+
+</LinearLayout>

@@ -1,4 +1,4 @@
-package cvut.cz.dp.nss.autocomplete;
+package cvut.cz.dp.nss.view;
 
 import android.content.Context;
 import android.os.Handler;

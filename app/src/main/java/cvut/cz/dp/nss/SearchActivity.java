@@ -4,23 +4,27 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Map;
 
-import cvut.cz.dp.nss.autocomplete.DelayAutoCompleteTextView;
-import cvut.cz.dp.nss.autocomplete.StopAutoCompleteAdapter;
+import cvut.cz.dp.nss.adapter.StopAutoCompleteAdapter;
+import cvut.cz.dp.nss.adapter.TimeTableAdapter;
 import cvut.cz.dp.nss.search.SearchParam;
 import cvut.cz.dp.nss.util.DateTimeUtil;
+import cvut.cz.dp.nss.view.DelayAutoCompleteTextView;
 
 /**
  * @author jakubchalupa
@@ -30,6 +34,11 @@ public class SearchActivity extends AppCompatActivity {
 
     private static final int THRESHOLD = 3;
 
+    /**
+     * name -> id
+     */
+    private Map<String, String> timeTableMap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //nastavime locale
@@ -38,6 +47,12 @@ public class SearchActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
+        //v hlavnim vlakne bude pozadavek na jizdni rady, opravdu to tak chceme, bez toho nema cenu
+        //cokoliv dalsiho vykreslovat
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -101,6 +116,17 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+        //selectbox pro vyber jizdniho radu
+        final Spinner spinner = (Spinner) findViewById(R.id.timetable_spinner);
+        final TimeTableAdapter timeTableAdapter = new TimeTableAdapter(this);
+        spinner.setAdapter(timeTableAdapter);
+        timeTableMap = timeTableAdapter.getItems();
+        if(timeTableMap.isEmpty()) {
+            //nepodarilo se nacist jizdni rady, takze zobrazim chybu a schovam formular
+            findViewById(R.id.search_form).setVisibility(View.GONE);
+            findViewById(R.id.serverErrorMessage).setVisibility(View.VISIBLE);
+            return;
+        }
 
         //naseptavac stanice z
         final DelayAutoCompleteTextView stopFromSearch = (DelayAutoCompleteTextView) findViewById(R.id.stopFrom);
@@ -169,9 +195,10 @@ public class SearchActivity extends AppCompatActivity {
         DelayAutoCompleteTextView stopFrom = (DelayAutoCompleteTextView) findViewById(R.id.stopFrom);
         DelayAutoCompleteTextView stopTo = (DelayAutoCompleteTextView) findViewById(R.id.stopTo);
         DelayAutoCompleteTextView stopThrough = (DelayAutoCompleteTextView) findViewById(R.id.stopThrough);
+        Spinner spinner = (Spinner) findViewById(R.id.timetable_spinner);
 
         Intent intent = new Intent(this, SearchResultActivity.class);
-        intent.putExtra(SearchParam.TIME_TABLE.getValue(), "pid");
+        intent.putExtra(SearchParam.TIME_TABLE.getValue(), timeTableMap.get(spinner.getSelectedItem().toString()));
         intent.putExtra(SearchParam.STOP_FROM.getValue(), stopFrom.getText().toString());
         intent.putExtra(SearchParam.STOP_TO.getValue(), stopTo.getText().toString());
         intent.putExtra(SearchParam.STOP_THROUGH.getValue(), stopThrough.getText().toString());
@@ -216,4 +243,7 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    public Map<String, String> getTimeTableMap() {
+        return timeTableMap;
+    }
 }

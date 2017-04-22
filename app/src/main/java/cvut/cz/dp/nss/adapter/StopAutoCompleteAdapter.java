@@ -1,4 +1,4 @@
-package cvut.cz.dp.nss.autocomplete;
+package cvut.cz.dp.nss.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cvut.cz.dp.nss.R;
+import cvut.cz.dp.nss.SearchActivity;
 import cvut.cz.dp.nss.rest.RestClient;
 import cz.msebera.android.httpclient.Header;
 
@@ -28,10 +30,10 @@ import cz.msebera.android.httpclient.Header;
  */
 public class StopAutoCompleteAdapter extends BaseAdapter implements Filterable {
 
-    private Context mContext;
+    private SearchActivity mContext;
     private List<String> resultList = new ArrayList<>();
 
-    public StopAutoCompleteAdapter(Context context) {
+    public StopAutoCompleteAdapter(SearchActivity context) {
         mContext = context;
     }
 
@@ -68,9 +70,10 @@ public class StopAutoCompleteAdapter extends BaseAdapter implements Filterable {
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
                 if (constraint != null) {
-                    List<String> stops = getStops(null, constraint.toString());
+                    //vyber stanice z aktualne vybraneho jizdniho radu
+                    final Spinner spinner = (Spinner) mContext.findViewById(R.id.timetable_spinner);
+                    List<String> stops = getStops(mContext.getTimeTableMap().get(spinner.getSelectedItem().toString()), constraint.toString());
 
-                    // Assign the data to the FilterResults
                     filterResults.values = stops;
                     filterResults.count = stops.size();
                 }
@@ -98,7 +101,7 @@ public class StopAutoCompleteAdapter extends BaseAdapter implements Filterable {
         RequestParams params = new RequestParams("startsWith", stopStartsWith);
         final List<String> stops = new ArrayList<>();
 
-        RestClient.getSync("x-pid/stop", params, new JsonHttpResponseHandler() {
+        RestClient.getSync("x-" + timeTableId + "/stop", params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
                 try {

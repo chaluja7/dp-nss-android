@@ -4,20 +4,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/search_form"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="cvut.cz.dp.nss.SearchActivity"
     tools:showIn="@layout/activity_search">
 
-    <cvut.cz.dp.nss.autocomplete.DelayAutoCompleteTextView
+    <Spinner
+        android:id="@+id/timetable_spinner"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_width="fill_parent"
+        android:layout_height="42dp" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/timetable_spinner"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:id="@+id/timetable_line"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp" />
+
+    <cvut.cz.dp.nss.view.DelayAutoCompleteTextView
         android:id="@+id/stopFrom"
         android:inputType="textFilter"
         android:layout_width="fill_parent"
         android:layout_height="42dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:text="Dejvická"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timetable_spinner"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:imeOptions="flagNoExtractUi|actionSearch"/>
@@ -32,11 +57,11 @@
         android:layout_marginRight="30dp"
         android:layout_marginEnd="30dp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timetable_spinner"
         app:layout_constraintLeft_toRightOf="@+id/stopFrom"
-        android:layout_marginTop="12dp" />
+        android:layout_marginTop="20dp" />
 
-    <cvut.cz.dp.nss.autocomplete.DelayAutoCompleteTextView
+    <cvut.cz.dp.nss.view.DelayAutoCompleteTextView
         android:id="@+id/stopThrough"
         android:inputType="textFilter"
         android:layout_width="fill_parent"
@@ -65,7 +90,7 @@
         app:layout_constraintLeft_toRightOf="@+id/stopFrom"
         android:layout_marginTop="12dp" />
 
-    <cvut.cz.dp.nss.autocomplete.DelayAutoCompleteTextView
+    <cvut.cz.dp.nss.view.DelayAutoCompleteTextView
         android:id="@+id/stopTo"
         android:inputType="textFilter"
         android:layout_width="fill_parent"

@@ -3,7 +3,6 @@ package cvut.cz.dp.nss;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +19,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Map;
@@ -97,11 +95,6 @@ public class SearchActivity extends AppCompatActivity {
 
         //udalost po vybrani data z dialogu
         final DatePicker datePicker = (DatePicker) dialogDateView.findViewById(R.id.date_picker);
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            datePicker.getCalendarView().setFirstDayOfWeek(Calendar.MONDAY);
-        } else {
-            datePicker.setFirstDayOfWeek(Calendar.MONDAY);
-        }
         dialogDateView.findViewById(R.id.date_set).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -16,6 +17,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -35,21 +37,38 @@ import cz.msebera.android.httpclient.Header;
  */
 public class SearchResultActivity extends AppCompatActivity {
 
+    private ProgressBar progressBar;
+
+    private Button prevButton;
+
+    private Button nextButton;
+
+    private TextView errorMessage;
+
+    private LinearLayout table;
+
+    private List<SearchResultWrapper> searchResults;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result);
 
-        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.searchLoadingIndicator);
+        progressBar = (ProgressBar) findViewById(R.id.searchLoadingIndicator);
         progressBar.setVisibility(View.VISIBLE);
 
+        prevButton = (Button) findViewById(R.id.prevButton);
+        nextButton = (Button) findViewById(R.id.nextButton);
+        errorMessage = (TextView) findViewById(R.id.errorMessage);
+        table = (LinearLayout) findViewById(R.id.result_table);
+
         final Intent intent = getIntent();
-        search(intent.getStringExtra(SearchParam.TIME_TABLE.getValue()),
+        searchResults = search(intent.getStringExtra(SearchParam.TIME_TABLE.getValue()),
                 intent.getStringExtra(SearchParam.STOP_FROM.getValue()),
                 intent.getStringExtra(SearchParam.STOP_TO.getValue()), intent.getStringExtra(SearchParam.STOP_THROUGH.getValue()),
                 intent.getStringExtra(SearchParam.DATE.getValue()), intent.getIntExtra(SearchParam.MAX_TRANSFERS.getValue(), 3),
                 intent.getBooleanExtra(SearchParam.WITH_WHEELCHAIR.getValue(), false),
-                intent.getBooleanExtra(SearchParam.BY_ARRIVAL.getValue(), false), progressBar);
+                intent.getBooleanExtra(SearchParam.BY_ARRIVAL.getValue(), false));
     }
 
     /**
@@ -63,12 +82,11 @@ public class SearchResultActivity extends AppCompatActivity {
      * @param maxTransfers max pocet prestupu
      * @param withWheelChair pouze bezbarierove?
      * @param byArrival hledam dle casu prijezdu?
-     * @param progressBar tocitko na obrazovce
      * @return nalezene vysledky
      */
     private List<SearchResultWrapper> search(String timeTableId, String stopFrom, String stopTo, String stopThrough,
                                              String date, int maxTransfers, boolean withWheelChair,
-                                             boolean byArrival, final ProgressBar progressBar) {
+                                             boolean byArrival) {
 
         if(StringUtils.isBlank(timeTableId) || StringUtils.isBlank(stopFrom) || StringUtils.isBlank(stopTo) || StringUtils.isBlank(date)) {
             progressBar.setVisibility(View.GONE);
@@ -101,7 +119,6 @@ public class SearchResultActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
 
                     //najdu si layout, kam vykresluju vysledky
-                    LinearLayout table = (LinearLayout) findViewById(R.id.result_table);
                     int count = 0;
                     for(SearchResultWrapper result : results) {
 
@@ -147,41 +164,90 @@ public class SearchResultActivity extends AppCompatActivity {
 
                     if(!results.isEmpty()) {
                         //vse probehlo v poradku, takze zobrazim tlacitka na predchozi a pristi spoje
-                        findViewById(R.id.prevButton).setVisibility(View.VISIBLE);
-                        findViewById(R.id.nextButton).setVisibility(View.VISIBLE);
+                        prevButton.setVisibility(View.VISIBLE);
+                        nextButton.setVisibility(View.VISIBLE);
                     } else {
                         //nenalezeny zadne vysledky
                         findViewById(R.id.noResultsMessage).setVisibility(View.VISIBLE);
                     }
                 } catch (Exception e) {
-                    findViewById(R.id.errorMessage).setVisibility(View.VISIBLE);
+                    errorMessage.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                findViewById(R.id.errorMessage).setVisibility(View.VISIBLE);
+                errorMessage.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
                 super.onFailure(statusCode, headers, responseString, throwable);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                findViewById(R.id.errorMessage).setVisibility(View.VISIBLE);
+                errorMessage.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                findViewById(R.id.errorMessage).setVisibility(View.VISIBLE);
+                errorMessage.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
 
         return results;
+    }
+
+    /**
+     * najde dalsi spoje misto jiz nalezenych
+     */
+    public void findNext(View view) {
+        //schovam tlacitka prev a next
+        prevButton.setVisibility(View.INVISIBLE);
+        nextButton.setVisibility(View.INVISIBLE);
+
+        //pokud momentalne nemam zadne vysledky tak nemuzu hledat ani predchozi
+        if(searchResults.isEmpty()) {
+            return;
+        }
+
+        //zobrazim indikator nacitani
+        progressBar.setVisibility(View.VISIBLE);
+        //smazu vsechny jiz nalezene vysledky
+        table.removeAllViews();
+
+        //upravim datum hledani tak, aby byl o minutu vyssi, nez vyjezd naposledy nalezeneho vysledku
+        final Intent intent = getIntent();
+        SearchResultWrapper searchResultWrapper = searchResults.get(searchResults.size() - 1);
+
+        //ziskam datum a cas vyjezdu posledniho nalezeneho vysledku
+        String departureDate = searchResultWrapper.getDepartureDate();
+        String departureTime = searchResultWrapper.getStopTimes().get(0).getDeparture();
+        //pokud ma departureTime vteriny tak se jich zbavim
+        String[] split = departureTime.split(":");
+        if(split.length > 2) {
+            departureTime = split[0] + ":" + split[1];
+        }
+
+        //vezmu departure, prevedu na datum a pridam minutu
+        String departure = departureDate + " " + departureTime;
+        DateTime dateTime = DateTimeUtil.JODA_DATE_TIME_FORMATTER.parseDateTime(departure);
+        dateTime = dateTime.plusMinutes(1);
+
+        //a potom prevedu zpatky na string coz bude parametr pro nove vyhledavani
+        departure = dateTime.toString(DateTimeUtil.JODA_DATE_TIME_FORMATTER);
+
+        //a provedu vyhledavani dle casu odjezdu
+        searchResults = search(intent.getStringExtra(SearchParam.TIME_TABLE.getValue()),
+                intent.getStringExtra(SearchParam.STOP_FROM.getValue()),
+                intent.getStringExtra(SearchParam.STOP_TO.getValue()),
+                intent.getStringExtra(SearchParam.STOP_THROUGH.getValue()),
+                departure,
+                intent.getIntExtra(SearchParam.MAX_TRANSFERS.getValue(), 3),
+                intent.getBooleanExtra(SearchParam.WITH_WHEELCHAIR.getValue(), false), false);
     }
 
     /**

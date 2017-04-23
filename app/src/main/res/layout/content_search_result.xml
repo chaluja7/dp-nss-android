@@ -60,6 +60,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:text="Zobrazit další"
+        android:onClick="findNext"
         android:visibility="invisible"/>
 
     <ScrollView

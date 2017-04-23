@@ -1,5 +1,7 @@
 package cvut.cz.dp.nss.util;
 
+import org.joda.time.format.DateTimeFormat;
+
 import java.util.Calendar;
 
 /**
@@ -8,6 +10,13 @@ import java.util.Calendar;
  */
 
 public class DateTimeUtil {
+
+    public static final String DATE_TIME_PATTERN = "dd.MM.yyyy HH:mm";
+
+    /**
+     * je thread-safe
+     */
+    public static final org.joda.time.format.DateTimeFormatter JODA_DATE_TIME_FORMATTER = DateTimeFormat.forPattern(DATE_TIME_PATTERN);
 
     public static String getDateString(Calendar calendar) {
         return calendar.get(Calendar.DAY_OF_MONTH) + "." + (calendar.get(Calendar.MONTH) + 1) + "." + calendar.get(Calendar.YEAR);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,6 +7,7 @@
     tools:context="cvut.cz.dp.nss.SearchActivity">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
@@ -20,7 +21,16 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_search" />
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/appbar"
+        android:layout_centerHorizontal="true">
+
+        <include layout="@layout/content_search" />
+
+    </ScrollView>
 
     <TextView
         android:id="@+id/serverErrorMessage"
@@ -32,4 +42,4 @@
         android:textColor="@android:color/holo_red_light"
         android:visibility="gone" />
 
-</android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>

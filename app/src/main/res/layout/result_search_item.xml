@@ -11,7 +11,7 @@
 
     <TextView
         android:id="@+id/time1"
-        android:layout_width="50dp"
+        android:layout_width="55dp"
         android:layout_height="30dp"
         android:layout_marginStart="12dp"
         android:textSize="20sp"
@@ -33,7 +33,7 @@
 
     <TextView
         android:id="@+id/time2"
-        android:layout_width="50dp"
+        android:layout_width="55dp"
         android:layout_height="30dp"
         android:textSize="20sp"
         android:layout_marginStart="12dp"

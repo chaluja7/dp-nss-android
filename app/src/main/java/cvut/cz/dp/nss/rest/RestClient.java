@@ -14,7 +14,8 @@ public class RestClient {
     /**
      * root adresa serveru. (10.0.2.2 je localhost)
      */
-    private static final String BASE_URL = "http://10.0.2.2:8080/api/v1/";
+//    private static final String BASE_URL = "http://10.0.2.2:8080/api/v1/";
+    private static final String BASE_URL = "http://192.168.0.12:8080/api/v1/";
 
     private static SyncHttpClient syncClient;
     private static AsyncHttpClient asyncClient;

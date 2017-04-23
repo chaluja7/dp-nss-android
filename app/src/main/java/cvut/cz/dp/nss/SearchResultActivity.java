@@ -202,22 +202,42 @@ public class SearchResultActivity extends AppCompatActivity {
     }
 
     /**
+     * najde predchozi spoje misto jiz nalezenych
+     */
+    public void findPrev(View view) {
+        if(!findPrevOrNextCommonScreenClean()) return;
+
+        //upravim datum hledani tak, aby byl o minutu nizsi, nez prijezd prvniho nalezeneho vysledku
+        final Intent intent = getIntent();
+        SearchResultWrapper searchResultWrapper = searchResults.get(0);
+
+        //ziskam datum a cas vyjezdu prvniho nalezeneho vysledku
+        String arrivalDate = searchResultWrapper.getArrivalDate();
+        String arrivalTime = DateTimeUtil.getTimeWithoutSeconds(searchResultWrapper.getStopTimes().get(searchResultWrapper.getStopTimes().size() - 1).getArrival());
+
+        //vezmu arrival, prevedu na datum a uberu minutu
+        String arrival = arrivalDate + " " + arrivalTime;
+        DateTime dateTime = DateTimeUtil.JODA_DATE_TIME_FORMATTER.parseDateTime(arrival);
+        dateTime = dateTime.minusMinutes(1);
+
+        //a potom prevedu zpatky na string coz bude parametr pro nove vyhledavani
+        arrival = dateTime.toString(DateTimeUtil.JODA_DATE_TIME_FORMATTER);
+
+        //a provedu vyhledavani dle casu prijezdu
+        searchResults = search(intent.getStringExtra(SearchParam.TIME_TABLE.getValue()),
+                intent.getStringExtra(SearchParam.STOP_FROM.getValue()),
+                intent.getStringExtra(SearchParam.STOP_TO.getValue()),
+                intent.getStringExtra(SearchParam.STOP_THROUGH.getValue()),
+                arrival,
+                intent.getIntExtra(SearchParam.MAX_TRANSFERS.getValue(), 3),
+                intent.getBooleanExtra(SearchParam.WITH_WHEELCHAIR.getValue(), false), true);
+    }
+
+    /**
      * najde dalsi spoje misto jiz nalezenych
      */
     public void findNext(View view) {
-        //schovam tlacitka prev a next
-        prevButton.setVisibility(View.INVISIBLE);
-        nextButton.setVisibility(View.INVISIBLE);
-
-        //pokud momentalne nemam zadne vysledky tak nemuzu hledat ani predchozi
-        if(searchResults.isEmpty()) {
-            return;
-        }
-
-        //zobrazim indikator nacitani
-        progressBar.setVisibility(View.VISIBLE);
-        //smazu vsechny jiz nalezene vysledky
-        table.removeAllViews();
+        if(!findPrevOrNextCommonScreenClean()) return;
 
         //upravim datum hledani tak, aby byl o minutu vyssi, nez vyjezd naposledy nalezeneho vysledku
         final Intent intent = getIntent();
@@ -225,12 +245,7 @@ public class SearchResultActivity extends AppCompatActivity {
 
         //ziskam datum a cas vyjezdu posledniho nalezeneho vysledku
         String departureDate = searchResultWrapper.getDepartureDate();
-        String departureTime = searchResultWrapper.getStopTimes().get(0).getDeparture();
-        //pokud ma departureTime vteriny tak se jich zbavim
-        String[] split = departureTime.split(":");
-        if(split.length > 2) {
-            departureTime = split[0] + ":" + split[1];
-        }
+        String departureTime = DateTimeUtil.getTimeWithoutSeconds(searchResultWrapper.getStopTimes().get(0).getDeparture());
 
         //vezmu departure, prevedu na datum a pridam minutu
         String departure = departureDate + " " + departureTime;
@@ -248,6 +263,28 @@ public class SearchResultActivity extends AppCompatActivity {
                 departure,
                 intent.getIntExtra(SearchParam.MAX_TRANSFERS.getValue(), 3),
                 intent.getBooleanExtra(SearchParam.WITH_WHEELCHAIR.getValue(), false), false);
+    }
+
+    /**
+     * schova prvky a zobrazi tocitko
+     * @return true, pokud se bude dale vyhledavat, false jinak
+     */
+    private boolean findPrevOrNextCommonScreenClean() {
+        //schovam tlacitka prev a next
+        prevButton.setVisibility(View.INVISIBLE);
+        nextButton.setVisibility(View.INVISIBLE);
+
+        //pokud momentalne nemam zadne vysledky tak nemuzu hledat ani predchozi
+        if(searchResults.isEmpty()) {
+            return false;
+        }
+
+        //zobrazim indikator nacitani
+        progressBar.setVisibility(View.VISIBLE);
+        //smazu vsechny jiz nalezene vysledky
+        table.removeAllViews();
+
+        return true;
     }
 
     /**

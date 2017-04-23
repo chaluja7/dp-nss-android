@@ -212,9 +212,7 @@ public class SearchActivity extends AppCompatActivity {
         intent.putExtra(SearchParam.STOP_FROM.getValue(), stopFrom.getText().toString());
         intent.putExtra(SearchParam.STOP_TO.getValue(), stopTo.getText().toString());
         intent.putExtra(SearchParam.STOP_THROUGH.getValue(), stopThrough.getText().toString());
-        //TODO plati to prvni
-//        intent.putExtra(SearchParam.DATE.getValue(), dateView.getText().toString() + " " + timeView.getText().toString());
-        intent.putExtra(SearchParam.DATE.getValue(), "16.3.2017 15:00");
+        intent.putExtra(SearchParam.DATE.getValue(), dateView.getText().toString() + " " + timeView.getText().toString());
         intent.putExtra(SearchParam.MAX_TRANSFERS.getValue(), Integer.parseInt(maxTransfersSpinner.getSelectedItem().toString()));
         intent.putExtra(SearchParam.WITH_WHEELCHAIR.getValue(), wheelChair.isChecked());
         intent.putExtra(SearchParam.BY_ARRIVAL.getValue(), checkedIndex == 1);

@@ -38,7 +38,7 @@ public class DateTimeUtil {
         if(time == null || !time.contains(":")) return time;
 
         String[] split = time.split(":");
-        return split.length == 3 ? split[0] + ":" + split[1] : time;
+        return split.length > 2 ? split[0] + ":" + split[1] : time;
     }
 
     public static String getMinutesLabel(int numOfMinutes) {

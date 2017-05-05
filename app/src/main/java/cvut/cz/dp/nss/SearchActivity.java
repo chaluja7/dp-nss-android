@@ -30,11 +30,16 @@ import cvut.cz.dp.nss.util.DateTimeUtil;
 import cvut.cz.dp.nss.view.DelayAutoCompleteTextView;
 
 /**
+ * Aktivita (obrazovka) vyhledavani spoju
+ *
  * @author jakubchalupa
  * @since 21.04.17
  */
 public class SearchActivity extends AppCompatActivity {
 
+    /**
+     * min pocet znaku pro zapoceti vyhledavani stanic v naseptavaci
+     */
     private static final int THRESHOLD = 3;
 
     /**
@@ -42,6 +47,9 @@ public class SearchActivity extends AppCompatActivity {
      */
     private Map<String, String> timeTableMap;
 
+    /**
+     * dialog s nastavenim aplikace
+     */
     private View dialogOptionView;
 
     @Override
@@ -192,6 +200,10 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * odesle vyhledavaci formular a prejde na vysledky vyhledavani
+     * @param view view
+     */
     public void submitForm(View view) {
         //sesbiram data z jednotlivych komponent
         final DelayAutoCompleteTextView stopFrom = (DelayAutoCompleteTextView) findViewById(R.id.stopFrom);

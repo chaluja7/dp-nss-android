@@ -23,6 +23,8 @@ import cvut.cz.dp.nss.rest.RestClient;
 import cz.msebera.android.httpclient.Header;
 
 /**
+ * Adapter pro selectbox s jizdnimy rady
+ *
  * @author jakubchalupa
  * @since 21.04.17
  */

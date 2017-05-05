@@ -32,21 +32,41 @@ import cvut.cz.dp.nss.util.DateTimeUtil;
 import cz.msebera.android.httpclient.Header;
 
 /**
+ * Aktivita (obrazovka) vysledku vyhledavani
+ *
  * @author jakubchalupa
  * @since 21.04.17
  */
 public class SearchResultActivity extends AppCompatActivity {
 
+    /**
+     * indikator nacitani vysledku
+     */
     private ProgressBar progressBar;
 
+    /**
+     * butotn predchozi vysledky
+     */
     private Button prevButton;
 
+    /**
+     * button dalsi vysledky
+     */
     private Button nextButton;
 
+    /**
+     * chybova hlaska
+     */
     private TextView errorMessage;
 
+    /**
+     * tabulka pro vlozeni vysledku vyhledavani na obrazovku
+     */
     private LinearLayout table;
 
+    /**
+     * vysledky vyhledavani
+     */
     private List<SearchResultWrapper> searchResults;
 
     @Override

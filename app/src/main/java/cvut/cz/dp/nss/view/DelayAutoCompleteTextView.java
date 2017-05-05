@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 /**
+ * Komponenta zpozdeneho autocompletu - zacne vyhledavat az po urcite dobe po vepsani znaku
+ *
  * @author jakubchalupa
  * @since 20.04.17
  */
